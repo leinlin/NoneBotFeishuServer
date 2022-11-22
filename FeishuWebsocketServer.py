@@ -14,8 +14,6 @@ import websockets
 import asyncio
 from pydantic import BaseModel
 
-logging.basicConfig(level=logging.DEBUG)
-
 app = Flask(__name__)
 
 
