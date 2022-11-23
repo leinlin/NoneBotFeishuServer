@@ -165,7 +165,7 @@ class WSServer:
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
 
-        ser = websockets.serve(self.handle, "0.0.0.0", port)
+        ser = websockets.serve(self.handle, "0.0.0.0", port, ping_interval=600, ping_timeout=600, close_timeout=600)
         loop.run_until_complete(ser)
         loop.run_forever()
 
