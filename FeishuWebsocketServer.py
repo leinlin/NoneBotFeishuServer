@@ -77,7 +77,8 @@ class Obj(dict):
 def dict_2_obj(d: dict):
     return Obj(d)
 
-loop = asyncio.get_event_loop()
+loop = asyncio.new_event_loop()
+asyncio.set_event_loop(loop)
 
 class WSServer:
 
