@@ -109,6 +109,7 @@ class WSServer:
 
                     decorator(h)
             except websockets.ConnectionClosed:
+                self.http_websocket = None
                 print('ConnectionClosed')
                 break
             await asyncio.sleep(1)
@@ -123,12 +124,10 @@ class WSServer:
             raise Exception("ENCRYPT_KEY is necessary")
         cipher = AESCipher(encrypt_key)
         encodeData = cipher.decrypt_string(encrypt_data)
-        app.logger.warning(encodeData)
         return encodeData
 
     def main(self):
         rule = request.url_rule.rule
-        app.logger.warning(f"rule:{rule}")
         bot_config = self.feishu_bots[rule]
 
         dict_data = json.loads(request.data)
