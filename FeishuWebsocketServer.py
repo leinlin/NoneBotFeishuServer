@@ -7,7 +7,7 @@ from typing import Optional
 from queue import Queue
 
 import requests
-from Crypto.Cipher import AES
+from Cryptodome.Cipher import AES
 from flask import Flask, request, jsonify
 import logging
 import websockets
@@ -86,12 +86,13 @@ class WSServer:
         self.http_websocket = None
         self.cmdQueue = Queue()
         self.feishu_bots: dict[str, Obj] = {}
+        self.http_websockets: dict = {}
 
-    async def send(self, msg):
-        return await self.http_websocket.send(msg)
+    async def send(self, url_rule, msg):
+        if url_rule in self.http_websockets:
+            return await self.http_websockets[url_rule].send(msg)
 
     async def handle(self, websocket, path):
-        self.http_websocket = websocket
         while True:
             try:
                 recv_msg = await websocket.recv()
@@ -99,6 +100,7 @@ class WSServer:
                 json_dict: dict = json.loads(recv_msg)
                 app_id = json_dict.get("app_id")
                 url_rule = f'/{app_id}'
+                self.http_websockets[url_rule] = websocket
                 if not self.feishu_bots.__contains__(url_rule):
                     print(f"create new rule:{url_rule}")
                     self.feishu_bots[url_rule] = dict_2_obj(json_dict)
@@ -109,7 +111,7 @@ class WSServer:
 
                     decorator(h)
             except websockets.ConnectionClosed:
-                self.http_websocket = None
+                self.http_websockets[url_rule] = None
                 print('ConnectionClosed')
                 break
             await asyncio.sleep(1)
@@ -158,7 +160,7 @@ class WSServer:
                 return "Verification token check failed", 403
 
 
-        loop.run_until_complete(self.send(json_data))
+        loop.run_until_complete(self.send(rule, json_data))
         return "OK", 200
 
     def run(self, port):
