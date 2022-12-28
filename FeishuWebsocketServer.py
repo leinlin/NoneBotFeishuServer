@@ -104,7 +104,7 @@ class WSServer:
                 if not self.feishu_bots.__contains__(url_rule):
                     print(f"create new rule:{url_rule}")
                     self.feishu_bots[url_rule] = dict_2_obj(json_dict)
-                    decorator = app.route(url_rule, methods=['POST'])
+                    decorator = app.route(url_rule, methods=['POST'], endpoint=app_id)
                     def h_decorator():
                         def h():
                             return self.main()
