@@ -105,11 +105,13 @@ class WSServer:
                     print(f"create new rule:{url_rule}")
                     self.feishu_bots[url_rule] = dict_2_obj(json_dict)
                     decorator = app.route(url_rule, methods=['POST'])
+                    def h_decorator():
+                        def h():
+                            return self.main()
 
-                    def h():
-                        return self.main()
+                        return h
 
-                    decorator(h)
+                    decorator(h_decorator())
             except websockets.ConnectionClosed:
                 self.http_websockets[url_rule] = None
                 print('ConnectionClosed')
